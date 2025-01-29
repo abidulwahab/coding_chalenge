@@ -1,0 +1,79 @@
+name: Deploy Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+      - name: Get EC2 Public IPs
+        run: |
+          echo "ANSIBLE_CONTROLLER_IP=$(terraform output -raw ansible_controller_ip)" >> $GITHUB_ENV
+          echo "WEB_SERVERS_IPS=$(terraform output -json web_servers_ips | jq -r '.[]')" >> $GITHUB_ENV
+
+      - name: Generate Ansible Inventory
+        run: |
+          echo "[ansible_controller]" > ansible/inventory.ini
+          echo "$ANSIBLE_CONTROLLER_IP ansible_user=ubuntu" >> ansible/inventory.ini
+          
+          echo "[webservers]" >> ansible/inventory.ini
+          for ip in $WEB_SERVERS_IPS; do
+            echo "$ip ansible_user=ubuntu" >> ansible/inventory.ini
+          done
+
+      - name: Upload Inventory File
+        uses: actions/upload-artifact@v3
+        with:
+          name: ansible-inventory
+          path: ansible/inventory.ini
+
+  ansible:
+    needs: terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Download Inventory File
+        uses: actions/download-artifact@v3
+        with:
+          name: ansible-inventory
+          path: ansible/
+
+      - name: Generate SSH Key
+        run: |
+          ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+          cat ~/.ssh/id_rsa.pub > ansible/id_rsa.pub
+
+      - name: Copy SSH Key to Ansible Controller
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@$ANSIBLE_CONTROLLER_IP "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
+          scp ~/.ssh/id_rsa.pub ubuntu@$ANSIBLE_CONTROLLER_IP:~/.ssh/id_rsa.pub
+          ssh ubuntu@$ANSIBLE_CONTROLLER_IP "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+
+      - name: Set Up SSH Access to Web Servers
+        run: |
+          for ip in $WEB_SERVERS_IPS; do
+            ssh ubuntu@$ANSIBLE_CONTROLLER_IP "ssh-keyscan $ip >> ~/.ssh/known_hosts"
+            ssh ubuntu@$ANSIBLE_CONTROLLER_IP "ssh -o StrictHostKeyChecking=no ubuntu@$ip 'echo SSH Connection Successful'"
+          done
+
+      - name: Run Ansible Playbook
+        run: |
+          ssh ubuntu@$ANSIBLE_CONTROLLER_IP "ansible-playbook -i inventory.ini ansible/playbook.yml"
+

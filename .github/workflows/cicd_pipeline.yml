@@ -26,10 +26,12 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
-
+        working-directory: terraform
+        
       - name: Get EC2 Public IPs
         run: |
           echo "ANSIBLE_CONTROLLER_IP=$(terraform output -raw ansible_controller_ip)" >> $GITHUB_ENV
@@ -50,7 +52,8 @@ jobs:
         with:
           name: ansible-inventory
           path: ansible/inventory.ini
-
+          working-directory: terraform
+        
   ansible:
     needs: terraform
     runs-on: ubuntu-latest

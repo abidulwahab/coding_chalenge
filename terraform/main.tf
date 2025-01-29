@@ -9,7 +9,7 @@ resource "tls_private_key" "git_instance_key" {
 
 # Define the key pair
 resource "aws_key_pair" "ansible_key" {
-  key_name   = "kabid_Key_Pair"
+  key_name   = "kabid_Key_Pair2"
 # public_key = file(var.public_key_path)
   public_key = tls_private_key.git_instance_key.public_key_openssh
 

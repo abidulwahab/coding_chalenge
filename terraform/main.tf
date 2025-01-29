@@ -7,6 +7,7 @@ resource "tls_private_key" "git_instance_key" {
   rsa_bits  = 4096
 }
 
+/*
 # Define the key pair
 resource "aws_key_pair" "ansible_key" {
   key_name   = "kabid_Key_Pair2"
@@ -14,6 +15,7 @@ resource "aws_key_pair" "ansible_key" {
   public_key = tls_private_key.git_instance_key.public_key_openssh
 
 }
+*/
 
 # Security group to allow SSH
 resource "aws_security_group" "allow_ssh" {
@@ -45,7 +47,7 @@ resource "aws_security_group" "allow_ssh" {
 resource "aws_instance" "ansible_controller" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  key_name      = aws_key_pair.ansible_key.key_name
+  key_name      = "kabid_Key_Pair"
   security_groups = [
     aws_security_group.allow_ssh.name
   ]
@@ -68,7 +70,7 @@ resource "aws_instance" "ansible_controller" {
 resource "aws_instance" "webserver" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  key_name      = aws_key_pair.ansible_key.key_name
+  key_name      = "kabid_Key_Pair"
   security_groups = [
     aws_security_group.allow_ssh.name
   ]

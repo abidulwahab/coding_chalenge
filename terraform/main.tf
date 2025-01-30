@@ -2,20 +2,7 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "tls_private_key" "git_instance_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
 
-/*
-# Define the key pair
-resource "aws_key_pair" "ansible_key" {
-  key_name   = "kabid_Key_Pair2"
-# public_key = file(var.public_key_path)
-  public_key = tls_private_key.git_instance_key.public_key_openssh
-
-}
-*/
 
 # Security group to allow SSH
 resource "aws_security_group" "allow_ssh" {

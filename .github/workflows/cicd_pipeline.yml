@@ -39,13 +39,24 @@ jobs:
       - name: Debug Terraform Output
         run: terraform output webserver_ip
         working-directory: terraform
-          
+      - name: Install jq
+        run: sudo apt-get install jq
+        
       - name: Get Webserver IP
         run: |
-            # Attempt to get raw output first, fall back to the formatted version if necessary
-            WEBSERVER_IP=$(terraform output -raw webserver_ip)
-            WEBSERVER_IP=$(terraform output -raw webserver_ip 2>/dev/null || terraform output webserver_ip | awk -F' = ' '{print $2}' | tr -d '"')
-
+          # Get the raw IP address (ensure we capture just the IP value, not debug information)
+          WEBSERVER_IP=$(terraform output -json webserver_ip | jq -r .)
+          
+          # Debug: print the value of WEBSERVER_IP
+          echo "DEBUG: Retrieved IP address: $WEBSERVER_IP"
+          
+          # If WEBSERVER_IP was set, add it to the GitHub environment variables
+          if [[ -n "$WEBSERVER_IP" ]]; then
+            echo "WEBSERVER_IP=$WEBSERVER_IP" >> $GITHUB_ENV
+          else
+            echo "Error: Unable to retrieve webserver IP."
+            exit 1
+          fi
             echo $WEBSERVER_IP
         shell: bash
         working-directory: terraform

@@ -45,7 +45,7 @@ jobs:
       - name: Get Webserver IP
         run: |
           # Get the raw IP address (ensure we capture just the IP value, not debug information)
-          WEBSERVER_IP=$(terraform output -json webserver_ip | jq -r .)
+          WEBSERVER_IP=$(terraform output -raw webserver_ip 2>/dev/null || terraform output webserver_ip | awk -F' = ' '{print $2}' | tr -d '"')
           echo $WEBSERVER_IP
         shell: bash
         working-directory: terraform

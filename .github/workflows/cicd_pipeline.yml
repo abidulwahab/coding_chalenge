@@ -66,9 +66,10 @@ jobs:
           
       - name: Debug, Show Inventory JSON
         run: cat inventory.json
-
+    
       - name: Set up SSH Key
         run: |
+          mkdir -p ~/.ssh  #  Ensure the .ssh directory exists
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
             

@@ -55,7 +55,7 @@ resource "null_resource" "ansible_provision" {
 #      ansible-playbook -i ansible/inventory.ini ansible/site.yml
     EOT
   }
-*/
+
 
 }
-
+*/

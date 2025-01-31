@@ -71,7 +71,7 @@ resource "aws_instance" "webserver" {
 
 resource "null_resource" "ansible_provision" {
   depends_on = [aws_instance.ansible_controller, aws_instance.webserver]
-
+/*
   provisioner "local-exec" {
     command = <<EOT
       echo "[webserver]" >> ~/ansible/inventory.ini
@@ -79,5 +79,7 @@ resource "null_resource" "ansible_provision" {
 #      ansible-playbook -i ansible/inventory.ini ansible/site.yml
     EOT
   }
+*/
+
 }
 

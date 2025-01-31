@@ -74,8 +74,8 @@ resource "null_resource" "ansible_provision" {
 
   provisioner "local-exec" {
     command = <<EOT
-      echo "[webserver]" >> ansible/inventory.ini
-      echo "${aws_instance.webserver.public_ip}" >> ansible/inventory.ini
+      echo "[webserver]" >> ~/ansible/inventory.ini
+      echo "${aws_instance.webserver.public_ip}" >> ~/ansible/inventory.ini
 #      ansible-playbook -i ansible/inventory.ini ansible/site.yml
     EOT
   }

@@ -70,7 +70,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh  #  Ensure the .ssh directory exists
           chmod 700 ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
       - name: Disable SSH Host Key Checking

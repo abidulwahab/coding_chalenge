@@ -42,8 +42,16 @@ jobs:
           
       - name: Get Webserver IP
         run: |
-          WEBSERVER_IP=$(terraform output -raw webserver_ip 2>/dev/null || terraform output webserver_ip | awk -F' = ' '{print $2}' | tr -d '"')
-          echo "WEBSERVER_IP=$WEBSERVER_IP" >> $GITHUB_ENV
+            # Attempt to get raw output first, fall back to the formatted version if necessary
+            WEBSERVER_IP=$(terraform output -raw webserver_ip 2>/dev/null || terraform output webserver_ip | awk -F' = ' '{print $2}' | tr -d '"')
+            
+            # If WEBSERVER_IP was set, add it to the GitHub environment variables
+            if [[ -n "$WEBSERVER_IP" ]]; then
+              echo "WEBSERVER_IP=$WEBSERVER_IP" >> $GITHUB_ENV
+            else
+              echo "Error: Unable to retrieve webserver IP."
+              exit 1
+            fi
         shell: bash
         working-directory: terraform
         

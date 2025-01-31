@@ -27,13 +27,13 @@ jobs:
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
-
-      - name: Terraform Destroy
-        run: terraform destroy -auto-approve
-        working-directory: terraform
         
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: terraform
+
+      - name: Refresh Terraform State
+        run: terraform refresh
         working-directory: terraform
 
       - name: Debug Terraform Output

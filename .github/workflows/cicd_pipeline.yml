@@ -74,7 +74,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           
       - name: Debug, Show Inventory JSON
-        run: cat ~/.ssh/id_rsa
+        run: ls -l ~/.ssh/
 
       - name: Debug, Show Inventory JSON
         run: echo "${{ secrets.AWS_PRIVATE_KEY }}"

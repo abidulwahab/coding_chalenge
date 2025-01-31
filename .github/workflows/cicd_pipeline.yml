@@ -44,6 +44,7 @@ jobs:
         run: |
             # Attempt to get raw output first, fall back to the formatted version if necessary
             WEBSERVER_IP=$(terraform output -raw webserver_ip)
+            echo "DEBUG: Retrieved IP address: $WEBSERVER_IP"
         shell: bash
         working-directory: terraform
         

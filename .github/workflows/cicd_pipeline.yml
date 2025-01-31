@@ -106,6 +106,13 @@ jobs:
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
 
+      - name: Debug SSH Key Setup
+        run: |
+          ls -lah ~/.ssh/
+          cat ~/.ssh/id_rsa.pub || echo "Public key not found"
+          cat ~/.ssh/id_rsa || echo "Private key not found"
+          chmod 600 ~/.ssh/id_rsa
+          
       - name: Run Ansible Playbook
         run: ansible-playbook -i inventory.json ansible/ansible_playbook.yml
 

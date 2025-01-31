@@ -55,11 +55,6 @@ jobs:
           echo "[webserver]" > ansible/inventory.ini
           echo "$WEBSERVER_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
 
-      - name: Wait for SSH to be Available
-        run: |
-          echo "Waiting for SSH on $WEBSERVER_IP..."
-          until nc -zv $WEBSERVER_IP 22; do sleep 5; done
-          echo "SSH is ready!"
 
       - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.ini ansible/ansible_playbook.yml

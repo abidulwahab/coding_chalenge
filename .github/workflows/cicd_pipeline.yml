@@ -72,6 +72,12 @@ jobs:
           echo "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
+      - name: Debug, Show Inventory JSON
+        run: cat ~/.ssh/id_rsa
+
+      - name: Debug, Show Inventory JSON
+        run: echo "${{ secrets.AWS_PRIVATE_KEY }}"
+        
       - name: Disable SSH Host Key Checking
         run: |
           echo "StrictHostKeyChecking no" >> ~/.ssh/config

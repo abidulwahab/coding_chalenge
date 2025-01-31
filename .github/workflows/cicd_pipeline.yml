@@ -37,25 +37,8 @@ jobs:
     needs: terraform
     runs-on: ubuntu-latest
     steps:
-      - name: Generate SSH Key
-        run: |
-          ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
-          cat ~/.ssh/id_rsa.pub > ansible/id_rsa.pub
-
-      - name: Copy SSH Key to Ansible Controller
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@$ANSIBLE_CONTROLLER_IP "mkdir -p ~/.ssh && chmod 700 ~/.ssh"
-          scp ~/.ssh/id_rsa.pub ubuntu@$ANSIBLE_CONTROLLER_IP:~/.ssh/id_rsa.pub
-          ssh ubuntu@$ANSIBLE_CONTROLLER_IP "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
-
-      - name: Set Up SSH Access to Web Servers
-        run: |
-          for ip in $WEB_SERVERS_IPS; do
-            ssh ubuntu@$ANSIBLE_CONTROLLER_IP "ssh-keyscan $ip >> ~/.ssh/known_hosts"
-            ssh ubuntu@$ANSIBLE_CONTROLLER_IP "ssh -o StrictHostKeyChecking=no ubuntu@$ip 'echo SSH Connection Successful'"
-          done
 
       - name: Run Ansible Playbook
         run: |
-          ssh ubuntu@$ANSIBLE_CONTROLLER_IP "ansible-playbook -i inventory.ini ansible/playbook.yml"
-
+          ssh ubuntu@$ANSIBLE_CONTROLLER_IP "ansible-playbook -i inventory.ini ansible_playbook.yml"
+        working-directory: ansible

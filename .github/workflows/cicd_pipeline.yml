@@ -31,10 +31,13 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: terraform
-        
+
+      - name: Debug Terraform Output
+        run: terraform output webserver_ip
+  
       - name: Get Webserver IP
         run: |
-          WEBSERVER_IP=$(terraform output -raw webserver_ip 2>/dev/null || terraform output webserver_ip | grep -oP '(?<=\s=\s).*' | tr -d '"')
+          WEBSERVER_IP=$(terraform output -raw webserver_ip 2>/dev/null || terraform output webserver_ip | awk -F' = ' '{print $2}' | tr -d '"')
           echo "WEBSERVER_IP=$WEBSERVER_IP" >> $GITHUB_ENV
         shell: bash
 

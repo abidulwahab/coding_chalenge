@@ -38,13 +38,15 @@ jobs:
 
       - name: Debug Terraform Output
         run: terraform output webserver_ip
-  
+        working-directory: terraform
+          
       - name: Get Webserver IP
         run: |
           WEBSERVER_IP=$(terraform output -raw webserver_ip 2>/dev/null || terraform output webserver_ip | awk -F' = ' '{print $2}' | tr -d '"')
           echo "WEBSERVER_IP=$WEBSERVER_IP" >> $GITHUB_ENV
         shell: bash
-
+        working-directory: terraform
+        
       - name: Update Ansible Inventory
         run: |
           echo "[webserver]" > ansible/inventory.ini

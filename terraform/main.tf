@@ -44,9 +44,10 @@ resource "aws_instance" "webserver" {
 
 }
 
+/*
 resource "null_resource" "ansible_provision" {
   depends_on = [aws_instance.webserver]
-/*
+
   provisioner "local-exec" {
     command = <<EOT
       echo "[webserver]" >> ~/ansible/inventory.ini

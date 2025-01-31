@@ -39,23 +39,51 @@ jobs:
       - name: Debug Terraform Output
         run: terraform output webserver_ip
         working-directory: terraform
-      - name: Install jq
-        run: sudo apt-get install jq
-        
-      - name: Get Webserver IP
-        run: |
-          # Get the raw IP address (ensure we capture just the IP value, not debug information)
-          WEBSERVER_IP=$(terraform output -raw webserver_ip 2>/dev/null || terraform output webserver_ip | awk -F' = ' '{print $2}' | tr -d '"')
-          echo $WEBSERVER_IP
-        shell: bash
-        working-directory: terraform
-        
-      - name: Update Ansible Inventory
-        run: |
-#          echo "[webservers]" > ansible/inventory.ini
- #         echo "$WEBSERVER_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
 
+  dynamic-inventory:
+    needs: terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install boto3
+
+      - name: Generate Dynamic Inventory
+        run: |
+          python scripts/generate_inventory.py > inventory.json
+        env:
+          AWS_REGION: eu-west-2
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Upload Inventory as an Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ansible-inventory
+          path: inventory.json
+
+  ansible:
+    needs: dynamic-inventory
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download Inventory
+        uses: actions/download-artifact@v3
+        with:
+          name: ansible-inventory
+
+      - name: Install Ansible
+        run: sudo apt update && sudo apt install -y ansible
+        
       - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.ini ansible/ansible_playbook.yml
 

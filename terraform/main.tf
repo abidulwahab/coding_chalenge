@@ -28,6 +28,28 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
+# Create AnsibleController Ubuntu EC2 instance
+resource "aws_instance" "ansible_controller" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  key_name      = "kabid_Key_Pair"
+  security_groups = [
+    aws_security_group.allow_ssh.name
+  ]
+
+  tags = {
+    Name = "AnsibleController"
+  }
+
+  # User data script to set up the instances
+  user_data = <<-EOF
+            #!/bin/bash
+            sudo apt-get update -y
+            sudo apt-get upgrade -y
+            sudo apt-get install -y ansible
+        EOF
+}
+
 # Create webserver Ubuntu EC2 instance
 resource "aws_instance" "webserver" {
   ami           = var.ami_id

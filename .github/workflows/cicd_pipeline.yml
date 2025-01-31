@@ -66,25 +66,7 @@ jobs:
       - name: Debug, Show Inventory JSON
         run: cat inventory.json
     
-      - name: Set up SSH Key
-        run: |
-          mkdir -p ~/.ssh  #  Ensure the .ssh directory exists
-          chmod 700 ~/.ssh
-          echo "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          
-      - name: Debug, Show Inventory JSON
-        run: ls -l ~/.ssh/
 
-      - name: Debug, Show Inventory JSON
-        run: echo "${{ secrets.AWS_PRIVATE_KEY }}"
-        
-      - name: Disable SSH Host Key Checking
-        run: |
-          echo "StrictHostKeyChecking no" >> ~/.ssh/config
-          echo "UserKnownHostsFile=/dev/null" >> ~/.ssh/config
-          chmod 600 ~/.ssh/config
-        
       - name: Upload Inventory as an Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -106,6 +88,23 @@ jobs:
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
 
+      - name: Set up SSH Key
+        run: |
+          mkdir -p ~/.ssh  #  Ensure the .ssh directory exists
+          chmod 700 ~/.ssh
+          echo "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+      - name: Debug, Show Inventory JSON
+        run: echo "${{ secrets.AWS_PRIVATE_KEY }}"
+        
+      - name: Disable SSH Host Key Checking
+        run: |
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+        
       - name: Debug SSH Key Setup
         run: |
           ls -lah ~/.ssh/

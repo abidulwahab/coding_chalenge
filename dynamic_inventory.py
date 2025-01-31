@@ -9,10 +9,10 @@ def get_instances():
     inventory = {
         "all": {
             "hosts": {},
-  #          "vars": {
- #               "ansible_user": "ubuntu",  # ✅ Set the SSH user
+            "vars": {
+                "ansible_user": "ubuntu",  # ✅ Set the SSH user
 #                "ansible_ssh_private_key_file": "~/.ssh/id_rsa"  # ✅ Use the private key
-   #         }
+           }
         }
     }
 

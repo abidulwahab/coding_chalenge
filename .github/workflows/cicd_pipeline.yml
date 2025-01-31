@@ -63,7 +63,10 @@ jobs:
           AWS_REGION: eu-west-2
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
+          
+      - name: Debug, Show Inventory JSON
+        run: cat inventory.json
+        
       - name: Upload Inventory as an Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -81,10 +84,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ansible-inventory
-
+        
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
 
       - name: Run Ansible Playbook
-        run: ansible-playbook -i ansible/inventory.ini ansible/ansible_playbook.yml
+        run: ansible-playbook -i inventory.json ansible/ansible_playbook.yml
 

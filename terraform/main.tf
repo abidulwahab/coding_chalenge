@@ -28,6 +28,7 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
+/*
 # Create AnsibleController Ubuntu EC2 instance
 resource "aws_instance" "ansible_controller" {
   ami           = var.ami_id
@@ -49,6 +50,8 @@ resource "aws_instance" "ansible_controller" {
             sudo apt-get install -y ansible
         EOF
 }
+*/
+
 
 # Create webserver Ubuntu EC2 instance
 resource "aws_instance" "webserver" {

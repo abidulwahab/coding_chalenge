@@ -10,7 +10,7 @@ def get_instances():
         "all": {
             "hosts": {},
             "vars": {
-                "ansible_user": "ubuntu"  # ✅ Set the SSH user
+                "ansible_user": "ubuntu"  #  Set the SSH user
  #               "ansible_ssh_private_key_file": "~/.ssh/id_rsa"  # ✅ Use the private key
            }
         }

@@ -20,6 +20,7 @@ jobs:
 
       - name: Verify AWS Identity
         run: aws sts get-caller-identity
+        
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
 
@@ -30,15 +31,6 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: terraform
-
-      - name: Refresh Terraform State
-        run: terraform refresh
-        working-directory: terraform
-
-      - name: Debug Terraform Output
-        run: terraform output webserver_ip
-        working-directory: terraform
-
 
   dynamic-inventory:
     needs: terraform
@@ -62,10 +54,6 @@ jobs:
           AWS_REGION: eu-west-2
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
-      - name: Debug, Show Inventory JSON
-        run: cat inventory.json
-    
 
       - name: Upload Inventory as an Artifact
         uses: actions/upload-artifact@v4
@@ -94,23 +82,12 @@ jobs:
           chmod 700 ~/.ssh
           echo "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          
-      - name: Debug, Show Inventory JSON
-        run: echo "${{ secrets.AWS_PRIVATE_KEY }}"
         
       - name: Disable SSH Host Key Checking
         run: |
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
           echo "UserKnownHostsFile=/dev/null" >> ~/.ssh/config
           chmod 600 ~/.ssh/config
-
-        
-      - name: Debug SSH Key Setup
-        run: |
-          ls -lah ~/.ssh/
-          cat ~/.ssh/id_rsa.pub || echo "Public key not found"
-          cat ~/.ssh/id_rsa || echo "Private key not found"
-          chmod 600 ~/.ssh/id_rsa
           
       - name: Run Ansible Playbook
         run: ansible-playbook -i inventory.json ansible/ansible_playbook.yml

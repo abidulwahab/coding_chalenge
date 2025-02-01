@@ -28,30 +28,6 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
-/*
-# Create AnsibleController Ubuntu EC2 instance
-resource "aws_instance" "ansible_controller" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  key_name      = "kabid_Key_Pair"
-  security_groups = [
-    aws_security_group.allow_ssh.name
-  ]
-
-  tags = {
-    Name = "AnsibleController"
-  }
-
-  # User data script to set up the instances
-  user_data = <<-EOF
-            #!/bin/bash
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
-            sudo apt-get install -y ansible
-        EOF
-}
-*/
-
 # Create webserver Ubuntu EC2 instance
 resource "aws_instance" "webserver" {
   ami           = var.ami_id
@@ -60,26 +36,8 @@ resource "aws_instance" "webserver" {
   security_groups = [
     aws_security_group.allow_ssh.name
   ]
-
   tags = {
     Name = "webserver"
   }
-
-
 }
 
-/*
-resource "null_resource" "ansible_provision" {
-  depends_on = [aws_instance.webserver]
-
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "[webserver]" >> ~/ansible/inventory.ini
-      echo "${aws_instance.webserver.public_ip}" >> ~/ansible/inventory.ini
-#      ansible-playbook -i ansible/inventory.ini ansible/site.yml
-    EOT
-  }
-
-
-}
-*/
